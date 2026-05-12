@@ -46,7 +46,8 @@ git --version
 > **Screenshot 1:** Take a screenshot of your terminal showing all three
 > successful version checks and insert it here.
 >
-> `[insert screenshot]`
+> <img width="818" height="433" alt="grafik" src="https://github.com/user-attachments/assets/281be569-ae18-4d96-8987-7068713e9d20" />
+
 
 ---
 
@@ -98,7 +99,9 @@ Read the table carefully and describe one concrete example of each:
 3. **Delete anomaly:** What information is permanently lost if order 1002 is
    deleted entirely?
 
-> *Your answers:*
+> 1. Every row with the mechanic Huber in it. So 1,2 and 3.
+> 2. Without an orderno and a ItemNo now new row can be added, so its not possible to add a new mechanic.
+> 3. The customer data.
 
 ### Task 1b – Write Down Functional Dependencies
 
@@ -111,7 +114,10 @@ Hints:
 - What does a single mechanic ID determine?
 - What only follows from the combination `(OrderNo, ItemNo)`?
 
-> *Your FD list:*
+> CostNo->CustName,CustCity
+> Plate->Make,Model,Year
+> MechId->MechName, HourlyRate
+> OrderNo,ItemNo->MechID, Description, Hours
 
 ### Questions for Task 1
 
@@ -119,17 +125,18 @@ Hints:
 respect to the primary key `(OrderNo, ItemNo)`? Justify your answer using the
 definition from Lecture 04.
 
-> *Your answer:*
+> It is one a partital dependency because the OrderNo itself describes the Customer
 
 **Question 1.2:** Identify a transitive dependency in the flat table and explain
 why it violates 3NF.
 
-> *Your answer:*
+> Make is a transitive dependency because it relates to the plate and only the plate is depending on a primary key.
 
 **Question 1.3:** Compute the attribute closure $\{\mathrm{OrderNo}\}^+$ using
 your FD list. Is `OrderNo` alone a superkey of the flat table?
 
-> *Your answer:*
+> {OrderNo}+ = {OrderNo, Date, CustNo, CustName, CustCity, Plate, Make, Model, Year}
+> OrderNo is not a superkey, because it doesnt describe the attributes ItemNo, MechId, Description and Hours.
 
 ---
 
@@ -154,7 +161,7 @@ then fill in the table below.
 Check: In every relation, does each non-key attribute depend on the **complete**
 primary key?
 
-> *Your check:*
+> Yes, every relation is correct.
 
 ### Task 2b – Decompose into 3NF
 
@@ -169,7 +176,8 @@ Examine `order` and `vehicle` for transitive dependencies.
 State your conclusion: are all five relations from Task 2a already in 3NF?
 If not, perform the missing decomposition.
 
-> *Your analysis and any further decomposition:*
+> Order: cust_no depend direct on oder_no and no other transitively depend between order_no, date , plate and cust_no occures. cust_name is in another relation.
+> Vehicle: the relation between cust_no and plate is correct, because cust_no is a foreigne key.
 
 ### Task 2c – Verify Losslessness
 
