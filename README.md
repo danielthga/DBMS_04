@@ -322,7 +322,8 @@ scp <username>@<server>:/path/to/DBMS_04/schema.svg ~/Downloads/schema.svg
 > **Screenshot 2:** Take a screenshot showing the rendered diagram with all
 > five entities and their relationships.
 >
-> `[insert screenshot]`
+> <img width="432" height="758" alt="grafik" src="https://github.com/user-attachments/assets/80611759-780b-4a1a-af0b-289f6404a6ca" />
+
 
 ### Task 3c – Commit
 
@@ -423,7 +424,8 @@ sqlite3 workshop.db ".tables"
 
 > **Screenshot 3:** Take a screenshot showing the `.tables` output.
 >
-> `[insert screenshot]`
+> <img width="524" height="67" alt="grafik" src="https://github.com/user-attachments/assets/96580429-a030-40f0-ad8b-5ca4fcb67f78" />
+
 
 ### Task 4c – Insert Sample Data
 
@@ -499,7 +501,8 @@ git commit -m "feat: DDL and sample data for normalized workshop schema"
 Justify both choices in terms of the domain — what does it mean for the
 business if an order is deleted versus if a customer is deleted?
 
-> *Your answer:*
+> When a order is deleted you dont need the work_item of it any more, so it can be deleted.
+> When a customer is deleted, you can keep the car because the car is independet from the owner and still exists.
 
 **Question 4.2:** Test referential integrity by running:
 
@@ -511,7 +514,7 @@ INSERT INTO work_item VALUES (9999, 1, 3, 'Ghost item', 1.0);
 What error do you get? What does this tell you about the difference between
 a constraint declared in DDL and one that is actually enforced at runtime?
 
-> *Your answer:*
+> FOREIGN KEY constraint failed (19) - This error occures because there is no ordernumber 9999 in the system and PRAGMA foreign_keys = ON will check this.
 
 **Question 4.3:** Test the CHECK constraint:
 
@@ -521,7 +524,7 @@ INSERT INTO work_item VALUES (1001, 3, 3, 'Invalid', -0.5);
 
 What happens? What would happen if the CHECK constraint were missing?
 
-> *Your answer:*
+> Runtime error: CHECK constraint failed: hours > 0 (19) - The hour would be smaler then 0 so this gives us an error. Without the check we could enter negativ working_hours which would be wrong.
 
 ---
 
@@ -540,6 +543,17 @@ then the SQL query.
 
 ```sql
 -- Query 5a: insert here
+SELECT 
+    o.order_no,
+    o.date,
+    o.plate,
+    w.description,
+    w.hours
+FROM customer c
+JOIN "order" o ON c.cust_no = o.cust_no
+JOIN work_item w ON o.order_no = w.order_no
+WHERE c.cust_name = 'Berger, Franz'
+ORDER BY o.date, w.item_no;
 ```
 
 <details>
@@ -554,7 +568,8 @@ order 1003 (BMW 320i, 2026-03-12).
 `work_item`). In what order would the query optimizer ideally perform the joins —
 and why does the join order not affect the *result*, but does affect *performance*?
 
-> *Your answer:*
+> The query optimizer should start with the most filtering table first, so he does not produce too much data.
+> The result will be the same in any order because it doesnt matter in which order the data is filtered.
 
 ---
 
@@ -566,7 +581,16 @@ place), and `orders` (the number of distinct orders in which the mechanic had at
 least one work item). Sort descending by `total_hours`.
 
 ```sql
--- Query 5b: insert here
+SELECT 
+    m.mech_name,
+    ROUND(SUM(w.hours), 1) AS total_hours,
+    COUNT(DISTINCT o.order_no) AS orders
+FROM mechanic m
+JOIN work_item w ON m.mech_id = w.mech_id
+JOIN "order" o ON w.order_no = o.order_no
+WHERE o.date BETWEEN '2026-03-01' AND '2026-03-31'
+GROUP BY m.mech_id
+ORDER BY total_hours DESC;
 ```
 
 <details>
@@ -583,7 +607,7 @@ least one work item). Sort descending by `total_hours`.
 What would `COUNT(*)` count instead, and why would the result differ in this
 case?
 
-> *Your answer:*
+> With the DISTINCT we wont count a order twice.
 
 ---
 
@@ -598,9 +622,23 @@ Use a set-difference approach with `EXCEPT` and also write an alternative using
 ```sql
 -- Variant 1: EXCEPT
 -- Query 5c-1: insert here
+SELECT plate, model
+FROM vehicle
+EXCEPT
+SELECT v.plate, v.model
+FROM vehicle v
+JOIN "order" o ON v.plate = o.plate;
 
 -- Variant 2: NOT EXISTS
 -- Query 5c-2: insert here
+SELECT v.plate, v.model
+FROM vehicle v
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM "order" o
+    WHERE o.plate = v.plate
+);
+
 ```
 
 <details>
@@ -621,7 +659,7 @@ After that, the query should return `BOT-ZZ 1 | Yaris`.
 always produce the same result. Are there situations where one approach should
 be preferred in practice? Consider readability and extensibility.
 
-> *Your answer:*
+> Use EXISTS / NOT EXISTS for clarity and when queries grow more complex; use EXCEPT when expressing a clean set difference between two simple result sets.
 
 ---
 
