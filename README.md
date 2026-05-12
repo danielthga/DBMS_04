@@ -189,7 +189,9 @@ $$R_1 \cap R_2 \rightarrow R_1 \setminus R_2 \quad \text{or} \quad R_1 \cap R_2 
 Name the shared attributes, state the FD you rely on, and conclude whether the
 decomposition is lossless.
 
-> *Your verification:*
+> Decomposition: order(order_no, date, plate, cust_no) and vehicle(plate, make, model, year, cust_no) Shared attributes: R1∩R2={plate,cust_no}
+> FD relied on: plate→make,model,year Heath check: (R1∩R2)→(R2∖R1):{plate,cust_no}→{make,model,year}
+> Conclusion: The shared attributes contain plate, which is the primary key of vehicle. Heath's criterion is satisfied → the decomposition is lossless
 
 ### Questions for Task 2
 
@@ -198,7 +200,7 @@ though the customer is also reachable via the vehicle's licence plate?
 Describe a realistic scenario where the direct link `order → customer` is
 necessary.
 
-> *Your answer:*
+> If a customer brings a car which is owned buy another customer. In this case the bill should go to the person who ordered the repair and not to the person which the car belongs to.
 
 **Question 2.2:** Is the schema after the 3NF decomposition also in BCNF?
 Justify your answer using the definition: for every non-trivial FD $X \rightarrow Y$,
@@ -211,7 +213,8 @@ mechanic changes their rate during the year, what problem arises for already
 completed orders? How could the schema be extended to correctly record
 historical hourly rates?
 
-> *Your answer:*
+> If the rate is changed, the rate is also updated in old orders. The cost will then change and will not fit to the bill which the customer paid.
+> The loans needs to be stored in a table with a date until the loans are valid. So the correct loan can be used to update tables.
 
 ---
 
