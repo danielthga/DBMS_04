@@ -679,14 +679,14 @@ The original flat table had 5 rows and 15 columns. The normalized schema has
 5 tables. At which data volume does normalization pay off most — at 5 rows or
 at 50,000? Justify with concrete reference to the anomalies from Task 1a.
 
-> *Your answer:*
+> The bigger the DB gets, the more the normalization pays off because we dont safe redundant data. Also its much easier to update some data without any anomalies.
 
 **Question B – 3NF vs. BCNF:**  
 Lecture 04 explains that BCNF is not always dependency-preserving. Is this
 relevant for the workshop schema? Would a BCNF decomposition have looked
 different from the 3NF decomposition here?
 
-> *Your answer:*
+> BCNF adds nothing here — the workshop schema is already “BCNF‑clean,” so 3NF and BCNF are identical in practice.
 
 **Question C – Redundant foreign key in `order`:**  
 `order` contains both `plate` (FK → `vehicle`) and `cust_no` (FK → `customer`).
@@ -694,7 +694,7 @@ Since `vehicle` itself contains `cust_no`, one might argue that `cust_no`
 in `order` is redundant and violates 3NF. Is that correct? When would such
 a deliberate denormalization be justified?
 
-> *Your answer:*
+> It’s not a 3NF violation because cust_no in order is a separate, meaningful fact. Denormalization is acceptable when it preserves history or improves performance.
 
 **Question D – NULL and order status:**  
 An order that has just been created may have no work items yet. What does the
@@ -702,12 +702,13 @@ current schema say about this case? Would the schema need to be extended to
 correctly represent an order's status (open / completed)? Sketch the necessary
 change.
 
-> *Your answer:*
+> If we want to represent the order’s status correctly, the schema needs an explicit attribute, for example:ALTER TABLE "order" ADD COLUMN status TEXT CHECK (status IN ('open', 'completed')) DEFAULT 'open';The current schema allows orders without items, but it cannot express their status. Adding a status column solves this cleanly.
 
 > **Screenshot 4:** Take a screenshot showing the output of Query 5b directly
 > in `sqlite3` (with `.headers on` and `.mode column` activated).
 >
-> `[insert screenshot]`
+> <img width="484" height="280" alt="grafik" src="https://github.com/user-attachments/assets/1747ce35-ea1b-460d-a4a5-9fd8a6085401" />
+
 
 ---
 
